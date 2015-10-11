@@ -84,14 +84,12 @@ createDocument($compCollection, "Haibike SDURO AllMtn RC",
 );
 
 // Iterate through the stored data
-echo "All components (including groups and bike builds):\n";
-dumpCollection($compCollection);
 echo "Manufacturers:\n";
 dumpCollection($manuCollection);
 
-// Full builds (we've seen this above, so commented out)
-#echo "Bikes:\n";
-#dumpCollection($compCollection, ['full-build' => true, ]);
+// Show the full builds, which include all of the above components
+echo "Bikes:\n";
+dumpCollection($compCollection, ['full-build' => true, ]);
 
 /**
  * Lists everything in the specified collection
