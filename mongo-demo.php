@@ -47,11 +47,35 @@ $ids[] = createDocument($compCollection, "Haibike SDURO frame",
 		'description' => "6061, All MNT, 4-Link System, Yamaha-Interface, hydroforced tubes, 150mm"
 	]
 );
-// @todo This drivetrain needs splitting up into several components
-$ids[] = createDocument($compCollection, "Gears", 
+
+// Special group for the drivetrain
+$dtIds = [];
+$dtIds[] = createDocument($compCollection, 'Haibike sDuro crank',
+	['material' => 'Aluminium', ]
+);
+$dtIds[] = createDocument($compCollection, 'Front Derailleur',
 	[
-		'speeds' => 10,
-		'description' => "Rear Derailleur: Shimano Deore XT M 786 Shadow Plus, 20 Speed, Cassette: Sram PG 1020 11-36 Teeth"]
+		'manufacturer' => 'shimano',
+		'gears' => 2,
+	]
+);
+$dtIds[] = createDocument($compCollection, "Rear Derailleur",
+	[
+		'manufacturer' => 'shimano',
+		'line' => 'Deore XT',
+		'model' => 'M 786 Shadow Plus',
+		'gears' => 10,
+	]
+);
+$dtIds[] = createDocument($compCollection, "Cassette",
+	[
+		'description' => 'Sram PG 1020 11-36 Teeth',
+	]
+);
+
+// Finally put the drivetrain together
+$ids[] = createDocument($compCollection, "Haibike SDURO Drivetrain",
+	['speeds' => 20, 'components' => createIdsGroup($dtIds), ]
 );
 
 // Let's create a full bike
