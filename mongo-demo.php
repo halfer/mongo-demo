@@ -34,7 +34,7 @@ createManufacturer($manuCollection, "Selle Royal");
 createManufacturer($manuCollection, "FSA");
 
 // Let's create some components
-$compCollection = $db->component;
+$compCollection = getComponentCollection($db);
 $ids = [];
 $ids[] = createDocument($compCollection, "Battery 400Wh", ['watt_hours' => 400, ]);
 $ids[] = createDocument($compCollection, "Motor",
@@ -105,19 +105,23 @@ function dumpCollection(MongoCollection $collection, $query = [])
 	{
 		echo "\t{$document['name']}\n";
 
-		dumpRecursive($collection, $document);
+		dumpRecursive($collection->db, $document);
 	}
 }
 
 /**
  * Recursively renders a container (e.g. a mongo document or an array element)
  * 
- * @param MongoCollection $parentCollection
+ * @param MongoDB $db
  * @param mixed $container
  * @param integer $level
  */
-function dumpRecursive(MongoCollection $parentCollection, $container, $level = 1)
+function dumpRecursive(MongoDB $db, $container, $level = 1)
 {
+	// Get collections we need
+	$components = getComponentCollection($db);
+	#$manufacturers = $db->manufacturers;
+
 	foreach ($container as $key => $value)
 	{
 		// Skip uninteresting properties
@@ -133,21 +137,21 @@ function dumpRecursive(MongoCollection $parentCollection, $container, $level = 1
 		{
 			// Render items in the next level down
 			echo "{$key}:\n";
-			dumpRecursive($parentCollection, $value, $level + 1);
+			dumpRecursive($db, $value, $level + 1);
 		}
 		else
 		{
 			if (isMongoRef($value))
 			{
 				// Render mongo ref
-				$cursor = $parentCollection->findOne(['_id' => getMongoIdObject($value)]);
+				$cursor = $components->findOne(['_id' => getMongoIdObject($value)]);
 
 				// If the component has a name, use that as a subheading
 				echo isset($cursor['name']) ? $cursor['name'] : '<component>';
 				echo "\n";
 
 				// ... and then render the component properties
-				dumpRecursive($parentCollection, $cursor, $level + 1);
+				dumpRecursive($db, $cursor, $level + 1);
 			}
 			else
 			{
@@ -165,7 +169,7 @@ function dumpRecursive(MongoCollection $parentCollection, $container, $level = 1
  */
 function zapDatabase(MongoDB $db)
 {
-	$db->component->drop();
+	getComponentCollection($db)->drop();
 	$db->manufacturer->drop();
 }
 
@@ -236,4 +240,15 @@ function getMongoIdObject($value)
 	$id = str_replace('mongoid:', '', $value);
 
 	return new MongoId($id);
+}
+
+/**
+ * Gets the component collection
+ * 
+ * @param MongoDB $db
+ * @return MongoCollection
+ */
+function getComponentCollection(MongoDB $db)
+{
+	return $db->component;
 }
