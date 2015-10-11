@@ -98,10 +98,6 @@ createDocument($compCollection, "Haibike SDURO AllMtn RC",
 	['full-build' => true, 'components' => createIdsGroup($ids), ]
 );
 
-// Iterate through the stored data
-echo "Manufacturers:\n";
-dumpCollection($manuCollection);
-
 // Show the full builds, which include all of the above components
 echo "Bikes:\n";
 dumpCollection($compCollection, ['full-build' => true, ]);
