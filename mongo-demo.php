@@ -45,15 +45,15 @@ $ids[] = createDocument($compCollection, "Motor",
 	[
 		'voltage' => 36, 'wattage' => 250,
 		'manufacturer' => getManufacturerId($manuCollection, 'yamaha'),
-		'list-price' => ['currency' => 'GBP', 'value' => 300, ]
+		'list_price' => ['currency' => 'GBP', 'value' => 300, ]
 	]
 );
 $ids[] = createDocument($compCollection, "Haibike SDURO frame",
 	[
 		'material' => 'Aluminium',
-		'size-inches' => 27.5,
+		'size_inches' => 27.5,
 		'description' => "6061, All MNT, 4-Link System, Yamaha-Interface, hydroforced tubes, 150mm",
-		'list-price' => ['currency' => 'GBP', 'value' => 400, ]
+		'list_price' => ['currency' => 'GBP', 'value' => 400, ]
 	]
 );
 
@@ -63,13 +63,13 @@ $dtIds[] = createDocument($compCollection, 'Haibike sDuro crank',
 	[
 		'material' => 'Aluminium',
 		'gears' => 2,
-		'list-price' => ['currency' => 'GBP', 'value' => 45, ]
+		'list_price' => ['currency' => 'GBP', 'value' => 45, ]
 	]
 );
 $dtIds[] = createDocument($compCollection, 'Front Derailleur',
 	[
 		'manufacturer' => getManufacturerId($manuCollection, 'shimano'),
-		'list-price' => ['currency' => 'GBP', 'value' => 40, ]
+		'list_price' => ['currency' => 'GBP', 'value' => 40, ]
 	]
 );
 $dtIds[] = createDocument($compCollection, "Rear Derailleur",
@@ -78,13 +78,13 @@ $dtIds[] = createDocument($compCollection, "Rear Derailleur",
 		'line' => 'Deore XT',
 		'model' => 'M 786 Shadow Plus',
 		'gears' => 10,
-		'list-price' => ['currency' => 'GBP', 'value' => 50, ]
+		'list_price' => ['currency' => 'GBP', 'value' => 50, ]
 	]
 );
 $dtIds[] = createDocument($compCollection, "Cassette",
 	[
 		'description' => 'Sram PG 1020 11-36 Teeth',
-		'list-price' => ['currency' => 'GBP', 'value' => 60, ]
+		'list_price' => ['currency' => 'GBP', 'value' => 60, ]
 	]
 );
 
@@ -95,10 +95,10 @@ $ids[] = createDocument($compCollection, "Haibike SDURO Drivetrain",
 
 // Let's create a full bike
 createDocument($compCollection, "Haibike SDURO AllMtn RC",
-	['full-build' => true, 'components' => createIdsGroup($ids), ]
+	['full_build' => true, 'components' => createIdsGroup($ids), ]
 );
 
 // Show the full builds, which include all of the above components
 echo "Bikes:\n";
-dumpCollection($compCollection, ['full-build' => true, ]);
+dumpCollection($compCollection, ['full_build' => true, ]);
 
