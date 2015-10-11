@@ -65,9 +65,9 @@ dumpCollection($compCollection);
 echo "Manufacturers:\n";
 dumpCollection($manuCollection);
 
-// Full builds
-echo "Bikes:\n";
-dumpCollection($compCollection, ['full-build' => true, ]);
+// Full builds (we've seen this above, so commented out)
+#echo "Bikes:\n";
+#dumpCollection($compCollection, ['full-build' => true, ]);
 
 /**
  * Lists everything in the specified collection
@@ -118,8 +118,13 @@ function dumpRecursive(MongoCollection $parentCollection, $container, $level = 1
 			if (isMongoRef($value))
 			{
 				// Render mongo ref
-				echo "<component>\n";
 				$cursor = $parentCollection->findOne(['_id' => getMongoIdObject($value)]);
+
+				// If the component has a name, use that as a subheading
+				echo isset($cursor['name']) ? $cursor['name'] : '<component>';
+				echo "\n";
+
+				// ... and then render the component properties
 				dumpRecursive($parentCollection, $cursor, $level + 1);
 			}
 			else
@@ -129,7 +134,6 @@ function dumpRecursive(MongoCollection $parentCollection, $container, $level = 1
 			}
 		}
 	}
-	echo "\n";
 }
 
 /**
