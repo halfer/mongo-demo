@@ -81,31 +81,44 @@ function dumpCollection(MongoCollection $collection, $query = [])
 
 	foreach ($cursor as $document)
 	{
-		#print_r($document);
 		echo "\t{$document['name']}\n";
 
-		// Render all the interesting properties of this doc
-		foreach ($document as $key => $value)
-		{
-			if ($key == '_id' || $key == 'name')
-			{
-				continue;
-			}
-
-			echo "\t\t{$key}: ";
-			if (is_array($value))
-			{
-				// Don't render nested items yet
-				echo "<group>\n";
-			}
-			else
-			{
-				// Render scalar value
-				echo "{$value}\n";
-			}
-		}
-		echo "\n";
+		dumpRecursive($document);
 	}
+}
+
+/**
+ * Recursively renders a container (e.g. a mongo document or an array element)
+ * 
+ * @param mixed $container
+ * @param integer $level
+ */
+function dumpRecursive($container, $level = 1)
+{
+	foreach ($container as $key => $value)
+	{
+		// Skip uninteresting properties
+		if ($key == '_id' || $key == 'name')
+		{
+			continue;
+		}
+
+		// Render indent suitable to recurse level
+		echo str_repeat("\t", $level + 1) . "{$key}: ";
+
+		if (is_array($value))
+		{
+			// Render items in the next level down
+			echo "\n";
+			dumpRecursive($value, $level + 1);
+		}
+		else
+		{
+			// Render scalar value
+			echo "{$value}\n";
+		}
+	}
+	echo "\n";
 }
 
 /**
