@@ -105,18 +105,28 @@ function dumpRecursive(MongoCollection $parentCollection, $container, $level = 1
 		}
 
 		// Render indent suitable to recurse level
-		echo str_repeat("\t", $level + 1) . "{$key}: ";
+		echo str_repeat("\t", $level + 1);
 
 		if (is_array($value))
 		{
 			// Render items in the next level down
-			echo "\n";
+			echo "{$key}:\n";
 			dumpRecursive($parentCollection, $value, $level + 1);
 		}
 		else
 		{
-			// Render scalar value
-			echo "{$value}\n";
+			if (isMongoRef($value))
+			{
+				// Render mongo ref
+				echo "<component>\n";
+				$cursor = $parentCollection->findOne(['_id' => getMongoIdObject($value)]);
+				dumpRecursive($parentCollection, $cursor, $level + 1);
+			}
+			else
+			{
+				// Render scalar value
+				echo "{$key}: {$value}\n";
+			}
 		}
 	}
 	echo "\n";
@@ -188,4 +198,16 @@ function createIdsGroup(array $group)
 	}
 
 	return $group;
+}
+
+function isMongoRef($value)
+{
+	return strpos($value, 'mongoid:') === 0;
+}
+
+function getMongoIdObject($value)
+{
+	$id = str_replace('mongoid:', '', $value);
+
+	return new MongoId($id);
 }
