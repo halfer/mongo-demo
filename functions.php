@@ -38,7 +38,7 @@ function dumpRecursive(MongoDB $db, $container, $level = 1)
 	foreach ($container as $key => $value)
 	{
 		// Skip uninteresting properties
-		if ($key == '_id' || $key == 'name')
+		if ($key === '_id' || $key === 'name')
 		{
 			continue;
 		}
@@ -54,7 +54,7 @@ function dumpRecursive(MongoDB $db, $container, $level = 1)
 		}
 		else
 		{
-			if ($key == 'manufacturer')
+			if ($key === 'manufacturer')
 			{
 				// Get manufacturer metadata
 				$document = $manufacturers->findOne(['_id' => getMongoIdObject($value)]);
