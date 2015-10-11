@@ -45,25 +45,31 @@ $ids[] = createDocument($compCollection, "Motor",
 	[
 		'voltage' => 36, 'wattage' => 250,
 		'manufacturer' => getManufacturerId($manuCollection, 'yamaha'),
+		'list-price' => ['currency' => 'GBP', 'value' => 300, ]
 	]
 );
 $ids[] = createDocument($compCollection, "Haibike SDURO frame",
 	[
 		'material' => 'Aluminium',
 		'size-inches' => 27.5,
-		'description' => "6061, All MNT, 4-Link System, Yamaha-Interface, hydroforced tubes, 150mm"
+		'description' => "6061, All MNT, 4-Link System, Yamaha-Interface, hydroforced tubes, 150mm",
+		'list-price' => ['currency' => 'GBP', 'value' => 400, ]
 	]
 );
 
 // Special group for the drivetrain
 $dtIds = [];
 $dtIds[] = createDocument($compCollection, 'Haibike sDuro crank',
-	['material' => 'Aluminium', ]
+	[
+		'material' => 'Aluminium',
+		'gears' => 2,
+		'list-price' => ['currency' => 'GBP', 'value' => 45, ]
+	]
 );
 $dtIds[] = createDocument($compCollection, 'Front Derailleur',
 	[
 		'manufacturer' => getManufacturerId($manuCollection, 'shimano'),
-		'gears' => 2,
+		'list-price' => ['currency' => 'GBP', 'value' => 40, ]
 	]
 );
 $dtIds[] = createDocument($compCollection, "Rear Derailleur",
@@ -72,11 +78,13 @@ $dtIds[] = createDocument($compCollection, "Rear Derailleur",
 		'line' => 'Deore XT',
 		'model' => 'M 786 Shadow Plus',
 		'gears' => 10,
+		'list-price' => ['currency' => 'GBP', 'value' => 50, ]
 	]
 );
 $dtIds[] = createDocument($compCollection, "Cassette",
 	[
 		'description' => 'Sram PG 1020 11-36 Teeth',
+		'list-price' => ['currency' => 'GBP', 'value' => 60, ]
 	]
 );
 
