@@ -10,6 +10,11 @@
  * Bikes and their components will be stored in "components", and will of course have very
  * different properties. For example, a motor will have a voltage property, but this would
  * not be useful for a frame, which will have a colour property.
+ * 
+ * Components can contain components too, if it is felt necessary. For example rather than
+ * a bike->crank and bike->chain relationships, it may be cleaner to group them together in
+ * a drivetrain subgroup, e.g. bike->drivetrain->crank, bike->drivetrain->chain, especially
+ * if this drivetrain set is used in other bikes.
  */
 
 $m = new MongoClient();
@@ -35,22 +40,44 @@ $ids[] = createDocument($compCollection, "Battery 400Wh", ['watt_hours' => 400, 
 $ids[] = createDocument($compCollection, "Motor",
 	['voltage' => 36, 'wattage' => 250, 'manufacturer' => 'yahama', ]
 );
+$ids[] = createDocument($compCollection, "Haibike SDURO frame",
+	[
+		'material' => 'Aluminium',
+		'size_inches' => 27.5,
+		'description' => "6061, All MNT, 4-Link System, Yamaha-Interface, hydroforced tubes, 150mm"
+	]
+);
+// @todo This drivetrain needs splitting up into several components
+$ids[] = createDocument($compCollection, "Gears", 
+	[
+		'speeds' => 10,
+		'description' => "Rear Derailleur: Shimano Deore XT M 786 Shadow Plus, 20 Speed, Cassette: Sram PG 1020 11-36 Teeth"]
+);
+
+// Let's create a full bike
+createDocument($compCollection, "Haibike SDURO AllMtn RC",
+	['full-build' => true, 'components' => $ids, ]
+);
 
 // Iterate through the stored data
-echo "Components:\n";
+echo "All components (including groups and bike builds):\n";
 dumpCollection($compCollection);
 echo "Manufacturers:\n";
 dumpCollection($manuCollection);
+
+// Full builds
+echo "Bikes:\n";
+dumpCollection($compCollection, ['full-build' => true, ]);
 
 /**
  * Lists everything in the specified collection
  * 
  * @param MongoCollection $collection
  */
-function dumpCollection(MongoCollection $collection)
+function dumpCollection(MongoCollection $collection, $query = [])
 {
-	// Find everything in this collection
-	$cursor = $collection->find();
+	// Find things in this collection matching the supplied query
+	$cursor = $collection->find($query);
 
 	foreach ($cursor as $document)
 	{
