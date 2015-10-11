@@ -81,7 +81,30 @@ function dumpCollection(MongoCollection $collection, $query = [])
 
 	foreach ($cursor as $document)
 	{
+		#print_r($document);
 		echo "\t{$document['name']}\n";
+
+		// Render all the interesting properties of this doc
+		foreach ($document as $key => $value)
+		{
+			if ($key == '_id' || $key == 'name')
+			{
+				continue;
+			}
+
+			echo "\t\t{$key}: ";
+			if (is_array($value))
+			{
+				// Don't render nested items yet
+				echo "<group>\n";
+			}
+			else
+			{
+				// Render scalar value
+				echo "{$value}\n";
+			}
+		}
+		echo "\n";
 	}
 }
 
@@ -107,11 +130,15 @@ function createManufacturer(MongoCollection $collection, $name, array $propertie
 {
 	$shortname = str_replace(' ', '-', strtolower($name));
 	$allProps = array_merge($properties, ['shortname' => $shortname, ]);
-	createDocument($collection, $name, $allProps);
+	$id = createDocument($collection, $name, $allProps);
+
+	return $id;
 }
 
 /**
  * Creates a document in a collection
+ * 
+ * I'm inserting here using 'Acknowledged' write concerns
  * 
  * @param MongoCollection $collection
  * @param string $name
@@ -120,5 +147,18 @@ function createManufacturer(MongoCollection $collection, $name, array $propertie
 function createDocument(MongoCollection $collection, $name, array $properties = [])
 {
 	$allProps = array_merge($properties, ['name' => $name, ]);
-	$collection->insert($allProps);
+	$collection->insert(
+		$allProps,
+		['w' => 1, ]
+	);
+
+	// We should have a generated ID now
+	$id = null;
+	if (isset($allProps['_id']->{'$id'}))
+	{
+		$obj = $allProps['_id'];
+		$id = $obj->{'$id'};
+	}
+
+	return $id;
 }
