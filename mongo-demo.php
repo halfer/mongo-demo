@@ -102,3 +102,30 @@ createDocument($compCollection, "Haibike SDURO AllMtn RC",
 echo "Bikes:\n";
 dumpCollection($compCollection, ['full_build' => true, ]);
 
+// Use an aggregation pipeline to sum the prices of the components
+$pipeline = [
+	// Only include components that have a price
+	['$match' => ['list_price' => ['$exists' => true, ]]],
+	// Create a projection that contains the value child of the price subdocument
+	['$project' => [
+			'price' => '$list_price.value',
+	]],
+	// We do the summing here
+	['$group' => ['_id' => null, 'total' => ['$sum' => '$price', ]]],
+];
+$result = $compCollection->aggregate($pipeline);
+
+if (isset($result['result'][0]['total']))
+{
+	$price = $result['result'][0]['total'];
+	echo "Components total price: GBP{$price}\n";
+}
+
+/**
+ * Interesting extensions:
+ * 
+ * > Group by the currency - should be possible with aggregation
+ * > Deriving a component sum just for one build would be trickier - expect that would
+ *		need map-reduce functions in JavaScript, since the components are referenced
+ *		recursively.
+ */
