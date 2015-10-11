@@ -40,7 +40,7 @@ createManufacturer($manuCollection, "FSA");
 // Let's create some components
 $compCollection = getComponentCollection($db);
 $ids = [];
-$ids[] = createDocument($compCollection, "Battery 400Wh", ['watt_hours' => 400, ]);
+$ids[] = createDocument($compCollection, "Battery 400Wh", ['watt-hours' => 400, ]);
 $ids[] = createDocument($compCollection, "Motor",
 	[
 		'voltage' => 36, 'wattage' => 250,
@@ -50,7 +50,7 @@ $ids[] = createDocument($compCollection, "Motor",
 $ids[] = createDocument($compCollection, "Haibike SDURO frame",
 	[
 		'material' => 'Aluminium',
-		'size_inches' => 27.5,
+		'size-inches' => 27.5,
 		'description' => "6061, All MNT, 4-Link System, Yamaha-Interface, hydroforced tubes, 150mm"
 	]
 );
