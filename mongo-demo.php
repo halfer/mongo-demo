@@ -56,7 +56,7 @@ $ids[] = createDocument($compCollection, "Gears",
 
 // Let's create a full bike
 createDocument($compCollection, "Haibike SDURO AllMtn RC",
-	['full-build' => true, 'components' => $ids, ]
+	['full-build' => true, 'components' => createIdsGroup($ids), ]
 );
 
 // Iterate through the stored data
@@ -83,17 +83,18 @@ function dumpCollection(MongoCollection $collection, $query = [])
 	{
 		echo "\t{$document['name']}\n";
 
-		dumpRecursive($document);
+		dumpRecursive($collection, $document);
 	}
 }
 
 /**
  * Recursively renders a container (e.g. a mongo document or an array element)
  * 
+ * @param MongoCollection $parentCollection
  * @param mixed $container
  * @param integer $level
  */
-function dumpRecursive($container, $level = 1)
+function dumpRecursive(MongoCollection $parentCollection, $container, $level = 1)
 {
 	foreach ($container as $key => $value)
 	{
@@ -110,7 +111,7 @@ function dumpRecursive($container, $level = 1)
 		{
 			// Render items in the next level down
 			echo "\n";
-			dumpRecursive($value, $level + 1);
+			dumpRecursive($parentCollection, $value, $level + 1);
 		}
 		else
 		{
@@ -174,4 +175,17 @@ function createDocument(MongoCollection $collection, $name, array $properties = 
 	}
 
 	return $id;
+}
+
+/**
+ * Makes a collection of ids obvious in some way
+ */
+function createIdsGroup(array $group)
+{
+	foreach ($group as &$id)
+	{
+		$id = 'mongoid:' . $id;
+	}
+
+	return $group;
 }
