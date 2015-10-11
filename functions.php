@@ -89,7 +89,7 @@ function dumpRecursive(MongoDB $db, $container, $level = 1)
 function zapDatabase(MongoDB $db)
 {
 	getComponentCollection($db)->drop();
-	$db->manufacturer->drop();
+	getManufacturerCollection($db)->drop();
 }
 
 /**
