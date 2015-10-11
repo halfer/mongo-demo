@@ -24,7 +24,7 @@ $db = $m->bikes;
 zapDatabase($db);
 
 // Let's create some component manufacturers
-$manuCollection = $db->manufacturer;
+$manuCollection = getManufacturerCollection($db);
 
 createManufacturer($manuCollection, "Haibike");		// Of the bike itself
 createManufacturer($manuCollection, "Yamaha");		// Component manufacturers
@@ -38,7 +38,10 @@ $compCollection = getComponentCollection($db);
 $ids = [];
 $ids[] = createDocument($compCollection, "Battery 400Wh", ['watt_hours' => 400, ]);
 $ids[] = createDocument($compCollection, "Motor",
-	['voltage' => 36, 'wattage' => 250, 'manufacturer' => 'yahama', ]
+	[
+		'voltage' => 36, 'wattage' => 250,
+		'manufacturer' => getManufacturerId($manuCollection, 'yamaha'),
+	]
 );
 $ids[] = createDocument($compCollection, "Haibike SDURO frame",
 	[
@@ -55,13 +58,13 @@ $dtIds[] = createDocument($compCollection, 'Haibike sDuro crank',
 );
 $dtIds[] = createDocument($compCollection, 'Front Derailleur',
 	[
-		'manufacturer' => 'shimano',
+		'manufacturer' => getManufacturerId($manuCollection, 'shimano'),
 		'gears' => 2,
 	]
 );
 $dtIds[] = createDocument($compCollection, "Rear Derailleur",
 	[
-		'manufacturer' => 'shimano',
+		'manufacturer' => getManufacturerId($manuCollection, 'shimano'),
 		'line' => 'Deore XT',
 		'model' => 'M 786 Shadow Plus',
 		'gears' => 10,
@@ -120,7 +123,7 @@ function dumpRecursive(MongoDB $db, $container, $level = 1)
 {
 	// Get collections we need
 	$components = getComponentCollection($db);
-	#$manufacturers = $db->manufacturers;
+	$manufacturers = getManufacturerCollection($db);
 
 	foreach ($container as $key => $value)
 	{
@@ -141,17 +144,23 @@ function dumpRecursive(MongoDB $db, $container, $level = 1)
 		}
 		else
 		{
-			if (isMongoRef($value))
+			if ($key == 'manufacturer')
 			{
-				// Render mongo ref
-				$cursor = $components->findOne(['_id' => getMongoIdObject($value)]);
+				// Get manufacturer metadata
+				$document = $manufacturers->findOne(['_id' => getMongoIdObject($value)]);
+				echo "manufacturer: {$document['name']}\n";
+			}
+			elseif (isMongoRef($value))
+			{
+				// Render mongo ref from the components collection
+				$document = $components->findOne(['_id' => getMongoIdObject($value)]);
 
 				// If the component has a name, use that as a subheading
-				echo isset($cursor['name']) ? $cursor['name'] : '<component>';
+				echo isset($document['name']) ? $document['name'] : '<component>';
 				echo "\n";
 
 				// ... and then render the component properties
-				dumpRecursive($db, $cursor, $level + 1);
+				dumpRecursive($db, $document, $level + 1);
 			}
 			else
 			{
@@ -218,7 +227,7 @@ function createDocument(MongoCollection $collection, $name, array $properties = 
 }
 
 /**
- * Makes a collection of ids obvious in some way
+ * Marks an ID group as mongo IDs
  */
 function createIdsGroup(array $group)
 {
@@ -228,6 +237,35 @@ function createIdsGroup(array $group)
 	}
 
 	return $group;
+}
+
+/**
+ * Gets a manufacturer ID for a shortname
+ * 
+ * @param string $shortName
+ * @return string
+ */
+function getManufacturerId(MongoCollection $manuCollection, $shortName)
+{
+	$document = $manuCollection->findOne(['shortname' => $shortName, ]);
+
+	$id = null;
+	if (isset($document['_id']->{'$id'}))
+	{
+		$obj = $document['_id'];
+		$id = 'mongoid:' . $obj->{'$id'};
+	}
+
+	// Bork if an ID is not found
+	if (!$id)
+	{
+		trigger_error(
+			sprintf("Manufacturer `%s` not found - check spelling?", $shortName),
+			E_USER_ERROR
+		);
+	}
+
+	return $id;
 }
 
 function isMongoRef($value)
@@ -251,4 +289,15 @@ function getMongoIdObject($value)
 function getComponentCollection(MongoDB $db)
 {
 	return $db->component;
+}
+
+/**
+ * Gets the manufacturer collection
+ * 
+ * @param MongoDB $db
+ * @return MongoCollection
+ */
+function getManufacturerCollection(MongoDB $db)
+{
+	return $db->manufacturer;
 }
