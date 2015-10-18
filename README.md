@@ -63,3 +63,11 @@ For reference, the text output of the program `mongo-demo.php` is thus:
 								currency: GBP
 								value: 60
 	Components total price: GBP895
+
+Future improvements
+---
+
+I'd quite like to add a map-reduce feature, which I believe must be run as a `MongoCommand`, to
+work out the price of a specific bicycle. This needs to be summed recursively, and thus I think
+cannot be done with a simple aggregation pipeline.
+
